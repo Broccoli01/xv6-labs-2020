@@ -5,6 +5,7 @@
 #include "param.h"
 #include "memlayout.h"
 #include "spinlock.h"
+#include "sysinfo.h"
 #include "proc.h"
 
 uint64
@@ -106,5 +107,25 @@ sys_trace(void)
     return -1;
 
   myproc()->syscall_trace = mask; // 设置调用进程的 syscall_trace mask
+  return 0;
+}
+
+uint64 sys_sysinfo(void) {
+  struct sysinfo info;
+  uint64 user_addr;  // 用户空间结构体地址
+
+  // 1. 从 a0 寄存器获取用户指针
+  if (argaddr(0, &user_addr) < 0) 
+    return -1;
+
+  // 2. 填充内核空间的结构体
+  info.freemem = get_freemem();
+  info.nproc = get_nproc();
+
+  // 3. 复制回用户空间
+  struct proc *p = myproc();
+  if (copyout(p->pagetable, user_addr, (char*)&info, sizeof(info)) < 0)
+    return -1;
+
   return 0;
 }

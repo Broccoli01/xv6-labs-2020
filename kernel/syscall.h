@@ -21,3 +21,4 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_trace  22
+#define SYS_sysinfo 23  // 紧接 SYS_trace(22) 之后[3,8](@ref)
